@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: stat-service-db
+    environment:
+      POSTGRES_DB: goormdotcom-stat
+      POSTGRES_USER: goorm
+      POSTGRES_PASSWORD: goorm123!
+      TZ: Asia/Seoul
+    ports:
+      - "2345:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d roaming_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
