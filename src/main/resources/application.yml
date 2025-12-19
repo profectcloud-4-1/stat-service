@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: ${SERVER_PORT}
 
 spring:
   application:
@@ -12,10 +12,10 @@ spring:
       initialize-schema: always
 
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:2345/goormdotcom-stat
-    username: goorm
-    password: goorm123
+    driver-class-name: ${DB_DRIVER}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:

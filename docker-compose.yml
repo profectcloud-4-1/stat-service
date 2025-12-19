@@ -1,18 +1,32 @@
 services:
-  postgres:
+  stat-batch:
+    image: goormdotcom-stat:latest
+    container_name: goormdotcom-stat-batch
+    depends_on:
+      stat-service-db:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8081
+      DB_DRIVER: org.postgresql.Driver
+      DB_URL: jdbc:postgresql://stat-service-db:5432/goormdotcom-stat
+      DB_USERNAME: goorm
+      DB_PASSWORD: goorm123
+    restart: "no"
+
+  stat-service-db:
     image: postgres:16
     container_name: stat-service-db
     environment:
       POSTGRES_DB: goormdotcom-stat
       POSTGRES_USER: goorm
-      POSTGRES_PASSWORD: goorm123!
+      POSTGRES_PASSWORD: goorm123
       TZ: Asia/Seoul
-    ports:
-      - "2345:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d roaming_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stat-service-db"]
       interval: 10s
       timeout: 5s
       retries: 5
