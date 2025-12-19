@@ -1,9 +1,10 @@
 package profect.goorm1.goormdotcom.config;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
@@ -18,61 +19,35 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
 
+import profect.goorm1.goormdotcom.components.listeners.BatchChunkListener;
+import profect.goorm1.goormdotcom.components.listeners.BatchItemReadListener;
+import profect.goorm1.goormdotcom.components.listeners.BatchJobListener;
+import profect.goorm1.goormdotcom.components.listeners.BatchStepListener;
+import profect.goorm1.goormdotcom.domain.ReviewDailyAggregate;
+
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class ReviewDailyJobConfig {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-    private static final int CHUNK_SIZE = 500;
+    private static final int CHUNK_SIZE = 2;
+    private final BatchJobListener batchJobListener;
+    private final BatchStepListener batchStepListener;
+    private final BatchChunkListener batchChunkListener;
+    private final BatchItemReadListener<ReviewDailyAggregate> batchItemReadListener;
 
     @Bean
     public Job reviewDailyJob(JobRepository jobRepository, Step reviewDailyStep) {
         return new JobBuilder("reviewDailyJob", jobRepository)
-                .validator(statDateValidator())
-                .incrementer(new RunIdIncrementer())
+                .listener(batchJobListener)
                 .start(reviewDailyStep)
                 .build();
-    }
-
-    @Bean
-    public Job nonRedundantReviewDailyJob(JobRepository jobRepository, Step reviewDailyStep) {
-        return new JobBuilder("nonRedundantReviewDailyJob", jobRepository)
-                .validator(statDateValidator())
-                .start(reviewDailyStep)
-                .build();
-    }
-
-    @Bean
-    public Job noRestartReviewDailyJob(JobRepository jobRepository, Step reviewDailyStep) {
-        return new JobBuilder("noRestartReviewDailyJob", jobRepository)
-                .preventRestart()
-                .validator(statDateValidator())
-                .start(reviewDailyStep)
-                .build();
-    }
-
-    @Bean
-    public JobParametersValidator statDateValidator() {
-        return new JobParametersValidator() {
-            @Override
-            public void validate(JobParameters parameters) throws JobParametersInvalidException {
-                String statDate = parameters.getString("statDate");
-                if (statDate == null || statDate.isBlank()) {
-                    throw new JobParametersInvalidException("Missing required JobParameter: statDate (yyyy-MM-dd)");
-                }
-                try {
-                    LocalDate.parse(statDate); // ISO yyyy-MM-dd
-                } catch (DateTimeParseException e) {
-                    throw new JobParametersInvalidException("Invalid statDate format. Expected yyyy-MM-dd, got: " + statDate);
-                }
-            }
-        };
     }
 
     @Bean
@@ -83,12 +58,14 @@ public class ReviewDailyJobConfig {
             ItemWriter<ReviewDailyAggregate> reviewDailyWriter
     ) {
         return new StepBuilder("reviewDailyStep", jobRepository)
+                .listener(batchStepListener)
                 .<ReviewDailyAggregate, ReviewDailyAggregate>chunk(CHUNK_SIZE, transactionManager)
+                .listener(batchChunkListener)
+                .listener(batchItemReadListener)
                 .reader(reviewDailyReader)
                 .writer(reviewDailyWriter)
                 .build();
     }
-
 
     @Bean
     @StepScope
@@ -152,24 +129,5 @@ public class ReviewDailyJobConfig {
                 .sql(upsert)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
-    }
-
-    public static class ReviewDailyAggregate {
-        private final LocalDate statDate;
-        private final java.util.UUID productId;
-        private final long reviewCount;
-        private final long ratingSum;
-
-        public ReviewDailyAggregate(LocalDate statDate, java.util.UUID productId, long reviewCount, long ratingSum) {
-            this.statDate = statDate;
-            this.productId = productId;
-            this.reviewCount = reviewCount;
-            this.ratingSum = ratingSum;
-        }
-
-        public LocalDate getStatDate() { return statDate; }
-        public java.util.UUID getProductId() { return productId; }
-        public long getReviewCount() { return reviewCount; }
-        public long getRatingSum() { return ratingSum; }
     }
 }
