@@ -1,22 +1,24 @@
-package profect.goorm1.goormdotcom.config;
+package profect.goorm1.goormdotcom.config.review.daily.aggregation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.configuration.support.ScopeConfiguration;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -26,16 +28,16 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import profect.goorm1.goormdotcom.components.listeners.BatchChunkListener;
-import profect.goorm1.goormdotcom.components.listeners.BatchItemReadListener;
-import profect.goorm1.goormdotcom.components.listeners.BatchJobListener;
-import profect.goorm1.goormdotcom.components.listeners.BatchStepListener;
+import profect.goorm1.goormdotcom.common.listeners.BatchChunkListener;
+import profect.goorm1.goormdotcom.common.listeners.BatchItemReadListener;
+import profect.goorm1.goormdotcom.common.listeners.BatchJobListener;
+import profect.goorm1.goormdotcom.common.listeners.BatchStepListener;
 import profect.goorm1.goormdotcom.domain.ReviewDailyAggregate;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class ReviewDailyJobConfig {
+public class ReviewDailyAggregationJobConfig {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
     private static final int CHUNK_SIZE = 2;
@@ -46,7 +48,7 @@ public class ReviewDailyJobConfig {
 
     @Bean
     public Job reviewDailyJob(JobRepository jobRepository, Step reviewDailyStep) {
-        return new JobBuilder("reviewDailyJob", jobRepository)
+        return new JobBuilder("reviewDailyAggregationJob", jobRepository)
                 .listener(batchJobListener)
                 .start(reviewDailyStep)
                 .build();
