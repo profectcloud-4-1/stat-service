@@ -1,4 +1,4 @@
-package profect.goorm1.goormdotcom.components.listeners;
+package profect.goorm1.goormdotcom.common.listeners;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ItemReadListener;
