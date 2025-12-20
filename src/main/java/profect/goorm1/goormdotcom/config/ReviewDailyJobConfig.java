@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.configuration.support.ScopeConfiguration;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
@@ -114,7 +116,7 @@ public class ReviewDailyJobConfig {
 
     @Bean
     public JdbcBatchItemWriter<ReviewDailyAggregate> reviewDailyWriter(DataSource dataSource) {
-        String upsert = """
+        String sql = """
                 INSERT INTO p_review_daily (stat_date, product_id, review_count, rating_sum, updated_at)
                 VALUES (:statDate, :productId, :reviewCount, :ratingSum, CURRENT_TIMESTAMP)
                 ON CONFLICT (stat_date, product_id)
@@ -126,7 +128,7 @@ public class ReviewDailyJobConfig {
 
         return new JdbcBatchItemWriterBuilder<ReviewDailyAggregate>()
                 .dataSource(dataSource)
-                .sql(upsert)
+                .sql(sql)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
     }
