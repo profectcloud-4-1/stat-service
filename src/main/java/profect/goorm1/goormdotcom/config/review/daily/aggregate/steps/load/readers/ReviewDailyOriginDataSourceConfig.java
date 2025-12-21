@@ -1,5 +1,6 @@
 package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.load.readers;
 
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,20 +13,24 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 
+@JobScope
 @Configuration
 public class ReviewDailyOriginDataSourceConfig {
 
+    @JobScope
     @ConfigurationProperties("spring.datasource.review.raw")
     @Bean
     public DataSourceProperties reviewRawDataSourceProperties() {
         return new DataSourceProperties();
     }
 
+    @JobScope
     @Bean
     public DataSource reviewRawDataSource(DataSourceProperties reviewRawDataSourceProperties) {
         return reviewRawDataSourceProperties.initializeDataSourceBuilder().build();
     }
 
+    @JobScope
     @Bean
     @Profile("dev")
     public DataSourceInitializer reviewRawDataSourceInitializer(
