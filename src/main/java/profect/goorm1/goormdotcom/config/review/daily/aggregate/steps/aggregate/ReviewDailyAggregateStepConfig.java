@@ -10,8 +10,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import profect.goorm1.goormdotcom.common.listeners.BatchChunkListener;
 import profect.goorm1.goormdotcom.common.listeners.BatchItemReadListener;
 import profect.goorm1.goormdotcom.common.listeners.BatchStepListener;
-import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.reader.ReivewDailyAggregateReader;
-import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writer.ReviewDailyAggregateWriter;
+import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.processors.ExampleItemProcessor;
+import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.readers.ReivewDailyAggregateReader;
+import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writers.ReviewDailyAggregateWriter;
 import profect.goorm1.goormdotcom.domain.ReviewDailyAggregate;
 
 @Configuration
@@ -30,11 +31,26 @@ public class ReviewDailyAggregateStepConfig {
     @Bean
     public Step reviewDailyAggregateStep() {
         return new StepBuilder("reviewDailyAggregateStep", jobRepository)
+                .startLimit(2)
                 .listener(batchStepListener)
                 .<ReviewDailyAggregate, ReviewDailyAggregate>chunk(CHUNK_SIZE, transactionManager)
                 .listener(batchChunkListener)
                 .listener(batchItemReadListener)
                 .reader(reader)
+                .writer(writer)
+                .build();
+    }
+
+    @Bean
+    public Step exampleReviewDailyAggregateStep(ExampleItemProcessor processor) {
+        return new StepBuilder("exampleReviewDailyAggregateStep", jobRepository)
+                .startLimit(2)
+                .listener(batchStepListener)
+                .<ReviewDailyAggregate, ReviewDailyAggregate>chunk(CHUNK_SIZE, transactionManager)
+                .listener(batchChunkListener)
+                .listener(batchItemReadListener)
+                .reader(reader)
+                .processor(processor)
                 .writer(writer)
                 .build();
     }

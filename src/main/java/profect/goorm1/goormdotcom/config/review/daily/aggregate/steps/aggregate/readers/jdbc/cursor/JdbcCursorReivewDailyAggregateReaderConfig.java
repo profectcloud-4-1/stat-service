@@ -1,5 +1,6 @@
-package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.reader.jdbc.cursor;
+package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.readers.jdbc.cursor;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Configuration
+@RequiredArgsConstructor
 public class JdbcCursorReivewDailyAggregateReaderConfig {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");

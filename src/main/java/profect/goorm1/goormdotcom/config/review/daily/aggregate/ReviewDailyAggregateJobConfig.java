@@ -15,14 +15,26 @@ import profect.goorm1.goormdotcom.common.listeners.BatchJobListener;
 @RequiredArgsConstructor
 public class ReviewDailyAggregateJobConfig {
 
+    private final Step reviewDailyLoadStep;
     private final Step reviewDailyAggregateStep;
+    private final Step exampleReviewDailyAggregateStep;
     private final BatchJobListener batchJobListener;
 
     @Bean
-    public Job reviewDailyAggregateJob(JobRepository jobRepository, Step reviewDailyStep) {
+    public Job reviewDailyAggregateJob(JobRepository jobRepository) {
         return new JobBuilder("reviewDailyAggregateJob", jobRepository)
                 .listener(batchJobListener)
-                .start(reviewDailyAggregateStep)
+                .start(reviewDailyLoadStep)
+                .next(reviewDailyAggregateStep)
+                .build();
+    }
+
+    @Bean
+    public Job exampleReviewDailyAggregateJob(JobRepository jobRepository) {
+        return new JobBuilder("exampleReviewDailyAggregateJob", jobRepository)
+                .listener(batchJobListener)
+                .start(reviewDailyLoadStep)
+                .next(exampleReviewDailyAggregateStep)
                 .build();
     }
 }

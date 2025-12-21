@@ -1,12 +1,10 @@
-package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writer.jdbc.batch;
+package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writers.jdbc.batch;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.stereotype.Component;
-import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writer.ReviewDailyAggregateWriter;
+import profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writers.ReviewDailyAggregateWriter;
 import profect.goorm1.goormdotcom.domain.ReviewDailyAggregate;
 
 @Component

@@ -1,4 +1,4 @@
-package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.reader;
+package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.readers;
 
 import org.springframework.batch.item.ItemStreamReader;
 import profect.goorm1.goormdotcom.domain.ReviewDailyAggregate;

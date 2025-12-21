@@ -1,4 +1,4 @@
-package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writer.jdbc.batch;
+package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.aggregate.writers.jdbc.batch;
 
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
