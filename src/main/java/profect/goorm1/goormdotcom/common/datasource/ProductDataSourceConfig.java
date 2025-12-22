@@ -1,6 +1,5 @@
-package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.load.readers;
+package profect.goorm1.goormdotcom.common.datasource;
 
-import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,28 +12,23 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 
-@JobScope
 @Configuration
-public class ReviewDailyOriginDataSourceConfig {
+@Profile("ds-product")
+public class ProductDataSourceConfig {
 
-    @JobScope
-    @ConfigurationProperties("spring.datasource.review.raw")
+    @ConfigurationProperties("app.datasource.product")
     @Bean
-    public DataSourceProperties reviewRawDataSourceProperties() {
-        return new DataSourceProperties();
+    public DataSourceProperties productDataSourceProperties() { return new DataSourceProperties(); }
+
+    @Bean
+    public DataSource productDataSource(DataSourceProperties productDataSourceProperties) {
+        return productDataSourceProperties.initializeDataSourceBuilder().build();
     }
 
-    @JobScope
-    @Bean
-    public DataSource reviewRawDataSource(DataSourceProperties reviewRawDataSourceProperties) {
-        return reviewRawDataSourceProperties.initializeDataSourceBuilder().build();
-    }
-
-    @JobScope
     @Bean
     @Profile("dev")
     public DataSourceInitializer reviewRawDataSourceInitializer(
-            @Qualifier("reviewRawDataSource") DataSource reviewDataSource
+            @Qualifier("productDataSource") DataSource reviewDataSource
     ) {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(new ClassPathResource("db/review-raw/schema.sql"));

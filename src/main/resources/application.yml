@@ -17,13 +17,6 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-    review:
-      raw:
-        driver-class-name: ${REVIEW_RAW_DB_DRIVER}
-        url: ${REVIEW_RAW_DB_URL}
-        username: ${REVIEW_RAW_DB_USERNAME}
-        password: ${REVIEW_RAW_DB_PASSWORD}
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,3 +28,4 @@ spring:
   logging:
     level:
       org.springframework.batch: INFO
+      org.springframework.jdbc: DEBUG

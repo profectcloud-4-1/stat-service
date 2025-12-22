@@ -1,5 +1,6 @@
 package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.load.readers.jdbc.cursor;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -26,7 +27,7 @@ public class JdbcCursorReviewItemReaderConfig {
     @Bean
     @StepScope
     public JdbcCursorItemReader<Review> reviewItemReader(
-        @Qualifier(value = "reviewRawDataSource") DataSource dataSource,
+        @Qualifier(value = "productDataSource") DataSource dataSource,
         @Value("#{jobParameters['statDate']}") String statDate
     ) {
         LocalDate date = LocalDate.parse(statDate);

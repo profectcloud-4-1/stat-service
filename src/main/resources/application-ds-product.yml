@@ -1,0 +1,7 @@
+app:
+  datasource:
+    product:
+      driver-class-name: ${PRODUCT_DB_DRIVER}
+      url: ${PRODUCT_DB_URL}
+      username: ${PRODUCT_DB_USERNAME}
+      password: ${PRODUCT_DB_PASSWORD}
