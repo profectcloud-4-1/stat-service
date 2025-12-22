@@ -34,7 +34,7 @@ public class ReviewDailyAggregateJobConfig {
         return new JobBuilder("exampleReviewDailyAggregateJob", jobRepository)
                 .listener(batchJobListener)
                 .start(reviewDailyLoadStep)
-                .next(exampleReviewDailyAggregateStep)
+                .next(exampleReviewDailyAggregateStep) // example processor for raising exception
                 .build();
     }
 }
