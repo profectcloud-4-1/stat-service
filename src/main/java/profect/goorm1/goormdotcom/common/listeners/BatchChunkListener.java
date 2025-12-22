@@ -17,8 +17,9 @@ public class BatchChunkListener implements ChunkListener {
     public void afterChunk(ChunkContext context) {
         log.info("Finish a transaction after commiting a chunk");
         try {
-            log.info("휴, 잠시만 좀 쉬겠습니다... 5초만");
-            Thread.sleep(5000);
+            int second = 2;
+            log.info("휴, 잠시만 좀 쉬겠습니다... {}초만", second);
+            Thread.sleep(second*1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
