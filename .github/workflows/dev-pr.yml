@@ -31,13 +31,11 @@ jobs:
       - name: Slack notification
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          BUILD_RESULT: ${{ needs.build.result }}
-          TEST_RESULT: ${{ needs.test.result }}
+          TEST_RESULT: ${{ needs.gradle_test.result }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
           ACTOR: ${{ github.actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          SHA_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
         run: |
           cat > payload.json <<'JSON'
           {
@@ -70,11 +68,6 @@ jobs:
                     "type": "button",
                     "text": { "type": "plain_text", "text": "Open run", "emoji": true },
                     "url": "${RUN_URL}"
-                  },
-                  {
-                    "type": "button",
-                    "text": { "type": "plain_text", "text": "Commit", "emoji": true },
-                    "url": "${SHA_URL}"
                   }
                 ]
               }
