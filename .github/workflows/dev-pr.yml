@@ -1,0 +1,40 @@
+name: dev-pr.yml
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  gradle_test:
+    runs-on: ubuntu-latest
+    name: Gradle Test
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 17 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+
+      - name: Build with Gradle
+        run: ./gradlew test
+
+  slack_notification:
+    name: Slack notification
+    runs-on: ubuntu-latest
+    needs: [gradle_test]
+    steps:
+      - uses: slackapi/slack-github-action@v2
+      - name: Slack notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"CI: build=${{ needs.build.result }}, test=${{ needs.test.result }} | ${{ github.repository }} @ ${{ github.ref_name }} | run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+          "${{ secrets.SLACK_WEBHOOK_URL }}"
+  
+
+
+
