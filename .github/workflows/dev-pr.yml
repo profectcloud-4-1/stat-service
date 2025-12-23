@@ -33,42 +33,47 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           TEST_RESULT: ${{ needs.gradle_test.result }}
           REPO: ${{ github.repository }}
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ github.head_ref }}
           ACTOR: ${{ github.actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_requet.number }}
         run: |
           cat > payload.json <<'JSON'
           {
-            "text": "CI 결과",
+            "text": "CI Results",
             "blocks": [
               {
-                "type": "header",
-                "text": { "type": "plain_text", "text": "CI 결과", "emoji": true }
+                  "type": "header",
+                  "text": { "type": "plain_text", "text": "CI 결과", "emoji": true }
               },
               {
                 "type": "section",
                 "fields": [
-                  { "type": "mrkdwn", "text": "*Repo*\n${REPO}" },
-                  { "type": "mrkdwn", "text": "*Branch*\n${BRANCH}" },
-                  { "type": "mrkdwn", "text": "*Build*\n${BUILD_RESULT}" },
-                  { "type": "mrkdwn", "text": "*Test*\n${TEST_RESULT}" }
+                    { "type": "mrkdwn", "text": "*Repo*\n${REPO}" },
+                    { "type": "mrkdwn", "text": "*Branch*\n${BRANCH}" },
+                    { "type": "mrkdwn", "text": "*Test*\n${TEST_RESULT}" }
                 ]
               },
               {
                 "type": "context",
                 "elements": [
-                  { "type": "mrkdwn", "text": "actor: *${ACTOR}*" }
+                    { "type": "mrkdwn", "text": "actor: *${ACTOR}*" }
                 ]
               },
               { "type": "divider" },
               {
                 "type": "actions",
                 "elements": [
-                  {
-                    "type": "button",
-                    "text": { "type": "plain_text", "text": "Open run", "emoji": true },
-                    "url": "${RUN_URL}"
-                  }
+                    {
+                        "type": "button",
+                        "text": { "type": "plain_text", "text": "Open run", "emoji": true },
+                        "url": "${RUN_URL}"
+                    },
+                    {
+                        "type": "button",
+                        "text": { "type": "plain_text", "text": "Merge pull request", "emoji": true },
+                        "url": "${PR_URL}"
+                    }
                 ]
               }
             ]
