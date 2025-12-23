@@ -1,13 +1,13 @@
-name: dev-pr.yml
+name: dev-push.yml
 on:
-  pull_request:
+  push:
     branches:
       - dev
 
 jobs:
-  gradle_test:
+  gradle_build:
     runs-on: ubuntu-latest
-    name: Gradle Test
+    name: Gradle Build
     steps:
       - uses: actions/checkout@v5
 
@@ -21,30 +21,30 @@ jobs:
         uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
 
       - name: Build with Gradle
-        run: ./gradlew test
+        run: ./gradlew build
 
   slack_notification:
     name: Slack notification
     runs-on: ubuntu-latest
-    needs: [gradle_test]
+    needs: [gradle_build]
     steps:
       - name: Slack notification
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          TEST_RESULT: ${{ needs.gradle_test.result }}
+          TEST_RESULT: ${{ needs.gradle_build.result }}
           REPO: ${{ github.repository }}
-          BRANCH: ${{ github.head_ref }}
+          BRANCH: ${{ github.ref_name }}
           ACTOR: ${{ github.actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          PR_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_requet.number }}
+          BRANCH_URL: https://github.com/${{ github.repository }}
         run: |
           cat > payload.json <<'JSON'
           {
-            "text": "Pull-request result: ${BRANCH}",
+            "text": "Push: ${BRANCH}",
             "blocks": [
               {
                   "type": "header",
-                  "text": { "type": "plain_text", "text": "The result of CI - Pull Request", "emoji": true }
+                  "text": { "type": "plain_text", "text": "The result of CI - Push", "emoji": true }
               },
               {
                 "type": "section",
@@ -71,8 +71,8 @@ jobs:
                     },
                     {
                         "type": "button",
-                        "text": { "type": "plain_text", "text": "Merge pull request", "emoji": true },
-                        "url": "${PR_URL}"
+                        "text": { "type": "plain_text", "text": "Open repo", "emoji": true },
+                        "url": "${BRANCH_URL}"
                     }
                 ]
               }
