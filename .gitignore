@@ -44,3 +44,6 @@ tmp/
 
 ### Environment Variables ###
 .env*
+
+### Java Flight Recorder ###
+*.jfr
