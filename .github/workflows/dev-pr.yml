@@ -36,7 +36,7 @@ jobs:
           BRANCH: ${{ github.head_ref }}
           ACTOR: ${{ github.actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          PR_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_requet.number }}
+          PR_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.number }}
         run: |
           cat > payload.json <<'JSON'
           {
