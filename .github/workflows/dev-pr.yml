@@ -29,10 +29,63 @@ jobs:
     needs: [gradle_test]
     steps:
       - name: Slack notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          TEST_RESULT: ${{ needs.test.result }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SHA_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"CI: build=${{ needs.build.result }}, test=${{ needs.test.result }} | ${{ github.repository }} @ ${{ github.ref_name }} | run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
-          "${{ secrets.SLACK_WEBHOOK_URL }}"
+          cat > payload.json <<'JSON'
+          {
+            "text": "CI 결과",
+            "blocks": [
+              {
+                "type": "header",
+                "text": { "type": "plain_text", "text": "CI 결과", "emoji": true }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  { "type": "mrkdwn", "text": "*Repo*\n${REPO}" },
+                  { "type": "mrkdwn", "text": "*Branch*\n${BRANCH}" },
+                  { "type": "mrkdwn", "text": "*Build*\n${BUILD_RESULT}" },
+                  { "type": "mrkdwn", "text": "*Test*\n${TEST_RESULT}" }
+                ]
+              },
+              {
+                "type": "context",
+                "elements": [
+                  { "type": "mrkdwn", "text": "actor: *${ACTOR}*" }
+                ]
+              },
+              { "type": "divider" },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": { "type": "plain_text", "text": "Open run", "emoji": true },
+                    "url": "${RUN_URL}"
+                  },
+                  {
+                    "type": "button",
+                    "text": { "type": "plain_text", "text": "Commit", "emoji": true },
+                    "url": "${SHA_URL}"
+                  }
+                ]
+              }
+            ]
+          }
+          JSON
+          
+          envsubst < payload.json > payload.rendered.json
+          curl -sS -X POST -H 'Content-type: application/json' \
+            --data @payload.rendered.json \
+            "$SLACK_WEBHOOK_URL"
   
 
 
