@@ -35,3 +35,15 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Darwin ###
+**/.DS_Store
+
+### Temp Files ###
+tmp/
+
+### Environment Variables ###
+.env*
+
+### Java Flight Recorder ###
+*.jfr

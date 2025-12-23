@@ -19,8 +19,21 @@ repositories {
 }
 
 dependencies {
+
+    // spring-boot-starters
     implementation 'org.springframework.boot:spring-boot-starter-batch'
-    testImplementation 'org.springframework.boot:spring-boot-starter-batch-test'
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
+
+    // Utilities
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

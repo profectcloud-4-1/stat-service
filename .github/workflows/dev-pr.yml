@@ -1,0 +1,90 @@
+name: dev-pr.yml
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  gradle_test:
+    runs-on: ubuntu-latest
+    name: Gradle Test
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 17 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+
+      - name: Build with Gradle
+        run: ./gradlew test
+
+  slack_notification:
+    name: Slack notification
+    runs-on: ubuntu-latest
+    needs: [gradle_test]
+    steps:
+      - name: Slack notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TEST_RESULT: ${{ needs.gradle_test.result }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.head_ref }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_requet.number }}
+        run: |
+          cat > payload.json <<'JSON'
+          {
+            "text": "Pull-request result: ${BRANCH}",
+            "blocks": [
+              {
+                  "type": "header",
+                  "text": { "type": "plain_text", "text": "The result of CI - Pull Request", "emoji": true }
+              },
+              {
+                "type": "section",
+                "fields": [
+                    { "type": "mrkdwn", "text": "*Repo*\n${REPO}" },
+                    { "type": "mrkdwn", "text": "*Branch*\n${BRANCH}" },
+                    { "type": "mrkdwn", "text": "*Test*\n${TEST_RESULT}" }
+                ]
+              },
+              {
+                "type": "context",
+                "elements": [
+                    { "type": "mrkdwn", "text": "actor: *${ACTOR}*" }
+                ]
+              },
+              { "type": "divider" },
+              {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": { "type": "plain_text", "text": "Open run", "emoji": true },
+                        "url": "${RUN_URL}"
+                    },
+                    {
+                        "type": "button",
+                        "text": { "type": "plain_text", "text": "Merge pull request", "emoji": true },
+                        "url": "${PR_URL}"
+                    }
+                ]
+              }
+            ]
+          }
+          JSON
+          
+          envsubst < payload.json > payload.rendered.json
+          curl -sS -X POST -H 'Content-type: application/json' \
+            --data @payload.rendered.json \
+            "$SLACK_WEBHOOK_URL"
+  
+
+
+
