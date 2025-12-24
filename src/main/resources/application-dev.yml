@@ -30,4 +30,21 @@ spring:
       org.springframework.batch: INFO
       org.springframework.jdbc: DEBUG
 
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  prometheus:
+    metrics:
+      export:
+        pushgateway:
+          enabled: true
+          push-rate: 3s
+
+
+
+
+
+
 
