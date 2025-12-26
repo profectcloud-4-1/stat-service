@@ -29,18 +29,28 @@ spring:
     level:
       org.springframework.batch: INFO
       org.springframework.jdbc: DEBUG
+      org.springframework.boot.actuate.autoconfigure.tracing: DEBUG
+      io.micrometer.tracing: DEBUG
+      io.opentelemetry.exporter.otlp: DEBUG
+
+
 
 management:
   tracing:
     enabled: true
     sampling:
       probability: 1.0
+
   prometheus:
     metrics:
       export:
         pushgateway:
           enabled: true
-          push-rate: 3s
+          push-rate: 5s
+
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
 
 
 
