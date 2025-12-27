@@ -14,14 +14,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MicrometerConfig {
 
-//    @Bean
-//    public ObservationRegistry observationRegistry(MeterRegistry meterRegistry, Tracer tracer) {
-//        DefaultMeterObservationHandler observationHandler = new DefaultMeterObservationHandler(meterRegistry);
-//        ObservationRegistry observationRegistry = ObservationRegistry.create();
-//        observationRegistry.observationConfig()
-//                .observationHandler(new TracingAwareMeterObservationHandler<>(observationHandler, tracer));
-//        return observationRegistry;
-//    }
+    /**
+     * ObservationRegistry is Micrometer's central registry for observation configuration
+     * (e.g. handlers, predicates, filters)
+     * When this bean exists, Spring Boot auto-configures BatchObservabilityBeanPostProcessor.
+     */
+
+    @Bean
+    public ObservationRegistry observationRegistry(MeterRegistry meterRegistry, Tracer tracer) {
+        DefaultMeterObservationHandler observationHandler = new DefaultMeterObservationHandler(meterRegistry);
+        ObservationRegistry observationRegistry = ObservationRegistry.create();
+        observationRegistry.observationConfig()
+                .observationHandler(new TracingAwareMeterObservationHandler<>(observationHandler, tracer));
+        return observationRegistry;
+    }
 
     /**
      * The following bean declaration is for tracing signal of the batch job.
