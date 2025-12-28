@@ -34,7 +34,6 @@ spring:
       io.opentelemetry.exporter.otlp: DEBUG
 
 
-
 management:
   tracing:
     enabled: true
@@ -49,11 +48,13 @@ management:
           push-rate: 5s
 
   otlp:
+    logging:
+      endpoint: http://localhost:4317
+      transport: grpc
+
     tracing:
-      endpoint: http://localhost:4318/v1/traces
-
-
-
+      endpoint: http://localhost:4317
+      transport: grpc
 
 
 
