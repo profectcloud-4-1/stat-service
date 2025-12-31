@@ -6,21 +6,31 @@ services:
       stat-service-db:
         condition: service_healthy
     environment:
+      TZ: UTC
       SERVER_PORT: 8081
       DB_DRIVER: org.postgresql.Driver
       DB_URL: jdbc:postgresql://stat-service-db:5432/goormdotcom-stat
       DB_USERNAME: goorm
       DB_PASSWORD: goorm123
+      PRODUCT_DB_DRIVER: org.h2.Driver
+      PRODUCT_DB_URL: jdbc:h2:mem:devdb
+      PRODUCT_DB_USERNAME: sa
+      PRODUCT_DB_PASSWORD:
+      OTLP_LOGGING_ENDPOINT: http://host.docker.internal:4317
+      OTLP_LOGGING_TRANSPORT: grpc
+      OTLP_TRACING_ENDPOINT: http://host.docker.internal:4317
+      OTLP_TRACING_TRANSPORT: grpc
+      PROMETHEUS_PUSHGATEWAY_ADDRESS: host.docker.internal:9091
     restart: "no"
 
   stat-service-db:
     image: postgres:16
     container_name: stat-service-db
     environment:
+      TZ: UTC
       POSTGRES_DB: goormdotcom-stat
       POSTGRES_USER: goorm
       POSTGRES_PASSWORD: goorm123
-      TZ: Asia/Seoul
     ports:
       - "2345:5432"
     volumes:

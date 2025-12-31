@@ -2,6 +2,7 @@ package profect.goorm1.goormdotcom.config.review.daily.aggregate.steps.load.read
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,16 +14,15 @@ import profect.goorm1.goormdotcom.domain.Review;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class JdbcCursorReviewItemReaderConfig {
 
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+//    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
 
     @Bean
     @StepScope
@@ -33,11 +33,19 @@ public class JdbcCursorReviewItemReaderConfig {
         LocalDate date = LocalDate.parse(statDate);
 
         // KST 기준 하루 [from, to)
-        ZonedDateTime fromZdt = date.atStartOfDay(KST);
-        ZonedDateTime toZdt = date.plusDays(1).atStartOfDay(KST);
+//        ZonedDateTime fromZdt = date.atStartOfDay(KST);
+//        ZonedDateTime toZdt = date.plusDays(1).atStartOfDay(KST);
 
-        Timestamp from = Timestamp.from(fromZdt.toInstant());
-        Timestamp to = Timestamp.from(toZdt.toInstant());
+//        Timestamp from = Timestamp.from(fromZdt.toInstant());
+//        Timestamp to = Timestamp.from(toZdt.toInstant());
+
+        LocalDateTime fromStatDate = date.atStartOfDay();
+        LocalDateTime toStatDate = fromStatDate.plusDays(1);
+        log.info("fromStatDate: {}", fromStatDate);
+        log.info("toStatDate: {}", toStatDate);
+
+        Timestamp from = Timestamp.from(fromStatDate.toInstant(ZoneOffset.UTC));
+        Timestamp to = Timestamp.from(toStatDate.toInstant(ZoneOffset.UTC));
 
         String sql = """
                 SELECT
