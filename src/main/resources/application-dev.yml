@@ -46,15 +46,16 @@ management:
         pushgateway:
           enabled: true
           push-rate: 5s
+          address: ${PROMETHEUS_PUSHGATEWAY_ADDRESS}
 
   otlp:
     logging:
-      endpoint: http://localhost:4317
-      transport: grpc
+      endpoint: ${OTLP_LOGGING_ENDPOINT}
+      transport: ${OTLP_LOGGING_TRANSPORT}
 
     tracing:
-      endpoint: http://localhost:4317
-      transport: grpc
+      endpoint: ${OTLP_TRACING_ENDPOINT}
+      transport: ${OTLP_TRACING_TRANSPORT}
 
 
 
