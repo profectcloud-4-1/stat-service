@@ -22,14 +22,10 @@ public class JdbcCursorReivewDailyAggregateReaderConfig {
     @StepScope
     public JdbcCursorItemReader<ReviewDailyAggregate> reviewDailyAggregateReader(
             DataSource dataSource,
-            @Value("#{jobParameters['statDate']}") String statDate
+            @Value("#{jobParameters['statDate']}") LocalDate statDate
     ) {
-        LocalDate date = LocalDate.parse(statDate);
 
-        // KST 기준 하루 [from, to)
-//        ZonedDateTime fromZdt = date.atStartOfDay(KST);
-//        ZonedDateTime toZdt = date.plusDays(1).atStartOfDay(KST);
-        LocalDateTime fromStatDate = date.atStartOfDay();
+        LocalDateTime fromStatDate = statDate.atStartOfDay();
         LocalDateTime toStatDate = fromStatDate.plusDays(1);
 
         Timestamp from = Timestamp.from(fromStatDate.toInstant(ZoneOffset.UTC));
@@ -48,7 +44,7 @@ public class JdbcCursorReivewDailyAggregateReaderConfig {
                 """;
 
         RowMapper<ReviewDailyAggregate> rowMapper = (rs, rowNum) -> new ReviewDailyAggregate(
-                date,
+                statDate,
                 rs.getObject("product_id", java.util.UUID.class),
                 rs.getLong("review_count"),
                 rs.getLong("rating_sum")

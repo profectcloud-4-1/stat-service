@@ -21,25 +21,14 @@ import java.time.*;
 @RequiredArgsConstructor
 public class JdbcCursorReviewItemReaderConfig {
 
-//    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-
-
     @Bean
     @StepScope
     public JdbcCursorItemReader<Review> reviewItemReader(
         @Qualifier(value = "productDataSource") DataSource dataSource,
-        @Value("#{jobParameters['statDate']}") String statDate
+        @Value("#{jobParameters['statDate']}") LocalDate statDate
     ) {
-        LocalDate date = LocalDate.parse(statDate);
 
-        // KST 기준 하루 [from, to)
-//        ZonedDateTime fromZdt = date.atStartOfDay(KST);
-//        ZonedDateTime toZdt = date.plusDays(1).atStartOfDay(KST);
-
-//        Timestamp from = Timestamp.from(fromZdt.toInstant());
-//        Timestamp to = Timestamp.from(toZdt.toInstant());
-
-        LocalDateTime fromStatDate = date.atStartOfDay();
+        LocalDateTime fromStatDate = statDate.atStartOfDay();
         LocalDateTime toStatDate = fromStatDate.plusDays(1);
         log.info("fromStatDate: {}", fromStatDate);
         log.info("toStatDate: {}", toStatDate);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.boot.autoconfigure.batch.JobLauncherApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,7 @@ import profect.goorm1.goormdotcom.common.listeners.BatchJobListener;
 @RequiredArgsConstructor
 public class ReviewDailyAggregateJobConfig {
 
+    private final JobParametersValidator reviewDailyAggregateJobValidator;
     private final Step reviewDailyLoadStep;
     private final Step reviewDailyAggregateStep;
     private final Step exampleReviewDailyAggregateStep;
@@ -23,6 +25,7 @@ public class ReviewDailyAggregateJobConfig {
     @Bean
     public Job reviewDailyAggregateJob(JobRepository jobRepository) {
         return new JobBuilder("reviewDailyAggregateJob", jobRepository)
+                .validator(reviewDailyAggregateJobValidator)
                 .listener(batchJobListener)
                 .start(reviewDailyLoadStep)
                 .next(reviewDailyAggregateStep)
@@ -37,4 +40,5 @@ public class ReviewDailyAggregateJobConfig {
                 .next(exampleReviewDailyAggregateStep) // example processor for raising exception
                 .build();
     }
+
 }
